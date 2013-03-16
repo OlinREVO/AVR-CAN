@@ -4,6 +4,12 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
+/* TEST CAN CODE
+    For this test, we plan to use MOb0 as a receiver and MOb1
+    as a transmitter. 
+*/
+
+
 int initCan () {
     // enable interrupts: all, receive, transmit
     CANGIE = (_BV(ENIT) | _BV(ENRX));
@@ -13,6 +19,7 @@ int initCan () {
     CANCDMOB = _BV(CONMOB1); // enable reception
     CANPAGE = _BV(MOBNB0); // first MOb
     CANCDMOB = _BV(CONMOB1); // enable reception
+    // TODO: set ID tags and masks for msgs this MOb can accept
     return(0);
 }
 
@@ -44,10 +51,17 @@ int ISR(CANIT_vect) {
 }
 
 int sendCANMsg() {
-    uint8_t data = 0b00011011;
-    uint8_t dataLength = 1;
-    CANCDMOB &= ~(_BV(DLC3) | _BV(DLC2) | _BV(DLC1) | _BV(DLC0)) 
-    CANCDMOB |= dataLength;
+    uint8_t data = 0b00011011; // test data
+    uint8_t dataLength = 1; // only sending one test byte
+    CANPAGE = (_BV(MOBNB0) | _BV(AINC)); // set MOb number (1 for testing) and auto-increment bits in CAN page MOb register
+    CANCDMOB = (_BV(CONMOB0) | dataLength); // set transmit bit and data length bits of MOb control register
+    CANMSG = data; // set data page register
+    // set extraneous/compatibility registers to 0
+    CANIDT4 = 0;
+    CANIDT3 = 0;
+    // set ID tag registers
+    CANIDT2 = 0; //TODO
+    CANIDT1 = 0; //TODO
 
     return(0);
 }
