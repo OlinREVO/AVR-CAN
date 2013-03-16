@@ -55,7 +55,10 @@ int ISR(CANIT_vect) {
 
         // display received data on LEDs
         PORTB = data[i];
-        _delay_loop_2(30000);
+        int j;
+        for (j = 0; j < 50; ++j) {
+            _delay_loop_2(30000);
+        }
     }
     free(data);
     SREG=cSREG; //restore SREG
@@ -85,9 +88,12 @@ int main (void) {
     // set all PORTB pins for output
     DDRB = 0xFF;
 
+    // initialize CAN bus
+    initCan();
+
     for (;;) {
-        /* toggle PORTB.2 pins */
-        PORTB ^= 0xFF;
+        // send a msg every once in a while
+        sendCANMsg();
 
         for (i = 0; i < 50; i++) {
             _delay_loop_2(30000);
