@@ -65,7 +65,7 @@ int initCan () {
 
 // handle CAN interrupt
 // for testing purposes, assuming this is an RX interrupt
-ISR(CANIT_vect) {
+ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
     CANSTMOB |= _BV(RXOK); // reset receive interrupt flag
 
