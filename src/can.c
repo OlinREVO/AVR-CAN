@@ -94,6 +94,9 @@ int sendCANMsg() {
     //Wait for MOb1 to be free
     while(CANEN2 & (1 << ENMOB0));
 
+    CANEN2 |= (1 << ENMOB0); //Claim MOb1
+
+
     //Clear MOb status register
     CANSTMOB = 0x00;
 
@@ -112,12 +115,12 @@ int sendCANMsg() {
 //TODO: Figure out TXOK flag, use interrupts
 
     //wait for TXOK
-    //while( !(CANSTMOB & (1 << TXOK)) & timeout--);
+    while((CANSTMOB & (1 << TXOK)) != (1 << TXOK));// & timeout--);
 
     //Disable Transmission
     CANCDMOB = 0x00;
-    //Clear TXOK flag
-    //CANSTMOB = 0x00;
+    //Clear TXOK flag (and all others)
+    CANSTMOB = 0x00;
 //End TODO
 
     return(0);
@@ -127,7 +130,7 @@ int main (void) {
     // set all PORTB pins for output
 
 
-    DDRB = 0xFF;
+    DDRB |= 0xFF;
 
     // initialize CAN bus
     initCan();
