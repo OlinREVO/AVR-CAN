@@ -16,7 +16,8 @@ SOURCES = can.c
 # OUTDIR: directory to use for output
 OUTDIR = build
 # PROGRAMMER: name of programmer
-PROGRAMMER = avrispmkii
+PROGRAMMER = avrispmkII
+#PROGRAMMER = dragon_isp
 # PORT: location of programmer
 PORT = usb
 # define flags
