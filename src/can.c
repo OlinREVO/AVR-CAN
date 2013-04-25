@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <inttypes.h>
+#include <avr/interrupt.h>
 #include <stdlib.h>
 
 /* TEST CAN CODE
@@ -28,8 +29,8 @@ int initCan () {
     CANGIE = (_BV(ENIT) | _BV(ENRX));
     // compatibility with future chips
     CANIE1 = 0;
-    // enable interrupts on first two MObs
-    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1));
+    // enable interrupts on all MObs
+    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2));
 
     int8_t mob;
     for (mob=0; mob<6; mob++ ) {
@@ -41,16 +42,21 @@ int initCan () {
         CANSTMOB = 0x00;
     }
 
-    // set up MOb1 for reception
-    CANPAGE = (1 << MOBNB0);
+    // set up MOb2 for reception
+    CANPAGE = _BV(MOBNB1);
 
 
     // set compatibility registers to 0, RTR/IDE-mask to 1
     CANIDM4 = (_BV(RTRMSK) | _BV(IDEMSK));
     CANIDM3 = 0x00;
+    /*
     // only accept one specific message ID
     CANIDM2 = (_BV(IDMSK2) | _BV(IDMSK1) | _BV(IDMSK0));
-    CANIDM1 = 0x01;
+    CANIDM1 = 0x01;*/
+
+    // accept all IDs
+    CANIDM2 = 0x00;
+    CANIDM1 = 0x00;
 
     // enable reception, DLC8
     CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
@@ -67,6 +73,7 @@ int initCan () {
 // for testing purposes, assuming this is an RX interrupt
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
+    PORTB = 0xFF;
     CANSTMOB |= _BV(RXOK); // reset receive interrupt flag
 
     uint8_t bitmask = ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // data page 0
@@ -79,7 +86,7 @@ ISR(CAN_INT_vect) {
         data[i] = CANMSG;
 
         // display received data on LEDs
-        PORTB = data[i];
+        //PORTB = data[i];
         _delay_ms(100);
     }
     SREG=cSREG; //restore SREG
@@ -132,13 +139,17 @@ int main (void) {
 
     DDRB |= 0xFF;
 
+    // enable global interrupts
+    sei();
+
     // initialize CAN bus
     initCan();
 
     for (;;) {
+        PORTB = 0x00;
         // send a msg every once in a while
-        sendCANMsg();
-        _delay_ms(1000);
+        //sendCANMsg();
+        _delay_ms(50);
     }
 
     //return 0;
