@@ -5,12 +5,15 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 
+#define maxDataLength 8
+
 /* TEST CAN CODE
         For this test, we plan to use MOb0 as a receiver and MOb1
     as a transmitter.
 */
 
-uint8_t data[8];
+uint8_t receivedData[maxDataLength];
+uint8_t data[maxDataLength];
 
 int initCan () {
 
@@ -24,6 +27,11 @@ int initCan () {
     CANBT1 = 0x1E;
     CANBT2 = 0x04;
     CANBT3 = 0x13;
+
+    int i = 0;
+    for(i=0;i<maxDataLength;i++) {
+        receivedData[i] = 0x00;
+    }
 
     // enable interrupts: all, receive
     CANGIE = (_BV(ENIT) | _BV(ENRX));
@@ -74,21 +82,28 @@ int initCan () {
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
     PORTB = 0xFF;
-    CANSTMOB |= _BV(RXOK); // reset receive interrupt flag
+    CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
 
     uint8_t bitmask = ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // data page 0
     CANPAGE &= bitmask; // set data page 0
     uint8_t dataLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC
     // allocate enough space for the data block
     int i;
-    for (i = 0; i < dataLength; ++i) {
+    for(i=0;i<maxDataLength;i++) {
+        receivedData[i] = 0x00;
+    }
+    for (i = 0; i < maxDataLength; ++i) {
         //while data remains, read it
-        data[i] = CANMSG;
+        receivedData[i] = CANMSG;
 
         // display received data on LEDs
         //PORTB = data[i];
-        _delay_ms(100);
+        //_delay_ms(100);
     }
+    //_delay_ms(200);
+
+    // set up MOb for reception
+    CANCDMOB |= _BV(CONMOB1);
     SREG=cSREG; //restore SREG
 }
 
@@ -135,8 +150,6 @@ int sendCANMsg() {
 
 int main (void) {
     // set all PORTB pins for output
-
-
     DDRB |= 0xFF;
 
     // enable global interrupts
@@ -146,7 +159,13 @@ int main (void) {
     initCan();
 
     for (;;) {
-        PORTB = 0x00;
+        // data has been correctly received if LED turns on and off every second
+        if (receivedData[0]!=0x55){
+            PORTB = 0xFF;
+        } else {
+            PORTB = 0x00;
+        } 
+
         // send a msg every once in a while
         //sendCANMsg();
         _delay_ms(50);
