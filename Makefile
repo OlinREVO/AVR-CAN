@@ -8,11 +8,11 @@
 # user configuration:
 #######################################
 # TARGET: name of the output file
-TARGET = can
+TARGET = $(FILE)
 # MCU: part number to build for
 MCU = atmega16m1
 # SOURCES: list of input source sources
-SOURCES = can.c
+SOURCES = $(FILE).c
 # OUTDIR: directory to use for output
 OUTDIR = build
 # PROGRAMMER: name of programmer
