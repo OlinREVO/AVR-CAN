@@ -77,38 +77,12 @@ int initCan () {
     return(0);
 }
 
-// handle CAN interrupt
-// for testing purposes, assuming this is an RX interrupt
-ISR(CAN_INT_vect) {
-    char cSREG = SREG; //store SREG
-    PORTB = 0xFF;
-    CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
-
-    uint8_t bitmask = ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // data page 0
-    CANPAGE &= bitmask; // set data page 0
-    uint8_t dataLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC
-    // allocate enough space for the data block
-    int i;
-    for(i=0;i<maxDataLength;i++) {
-        receivedData[i] = 0x00;
+int sendCANMsg(int msg) {
+    if (msg) {
+        data[0] = 0xFF; // 0b11111111
+    } else {
+        data[0] = 0x00; // 0b00000000
     }
-    for (i = 0; i < maxDataLength; ++i) {
-        //while data remains, read it
-        receivedData[i] = CANMSG;
-
-        // display received data on LEDs
-        //PORTB = data[i];
-        //_delay_ms(100);
-    }
-    //_delay_ms(200);
-
-    // set up MOb for reception
-    CANCDMOB |= _BV(CONMOB1);
-    SREG=cSREG; //restore SREG
-}
-
-int sendCANMsg() {
-    data[0] = 0x55; // test msg
     uint8_t dataLength = 1; // only sending one test byte
     // set MOb number (0 for testing) and auto-increment bits in CAN page MOb register
     CANPAGE = ( _BV(AINC));
@@ -148,6 +122,52 @@ int sendCANMsg() {
     return(0);
 }
 
+// // handle CAN interrupt
+// // for testing purposes, assuming this is an RX interrupt
+// ISR(CAN_INT_vect) {
+//     char cSREG = SREG; //store SREG
+//     PORTB = 0xFF;
+//     CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
+
+//     uint8_t bitmask = ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // data page 0
+//     CANPAGE &= bitmask; // set data page 0
+//     uint8_t dataLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC
+//     // allocate enough space for the data block
+//     int i;
+//     for(i=0;i<maxDataLength;i++) {
+//         receivedData[i] = 0x00;
+//     }
+//     for (i = 0; i < maxDataLength; ++i) {
+//         //while data remains, read it
+//         receivedData[i] = CANMSG;
+
+//         // display received data on LEDs
+//         //PORTB = data[i];
+//         //_delay_ms(100);
+//     }
+//     //_delay_ms(200);
+
+//     // set up MOb for reception
+//     CANCDMOB |= _BV(CONMOB1);
+//     SREG=cSREG; //restore SREG
+// }
+
+int initButton() {
+    EICRA = _BV(ISC00);
+    EIMSK = _BV(INT0);
+    return(0);
+}
+
+// handle button press interrupt
+ISR(INT2_vect) {
+    char cSREG = SREG; //store SREG
+    sendCANMsg(0);
+    _delay_ms(500);
+    sendCANMsg(1);
+    _delay_ms(500);
+    SREG=cSREG; //restore SREG
+}
+
 int main (void) {
     // set all PORTB pins for output
     DDRB |= 0xFF;
@@ -157,18 +177,15 @@ int main (void) {
 
     // initialize CAN bus
     initCan();
+    // intitialize button interrupts
+    //initButton();
 
     for (;;) {
-        // data has been correctly received if LED turns on and off every second
-        if (receivedData[0]!=0x55){
-            PORTB = 0xFF;
-        } else {
-            PORTB = 0x00;
-        } 
-
         // send a msg every once in a while
-        //sendCANMsg();
-        _delay_ms(50);
+        sendCANMsg(0);
+        _delay_ms(500);
+        sendCANMsg(1);
+        _delay_ms(500);
     }
 
     //return 0;

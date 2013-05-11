@@ -87,6 +87,7 @@ ISR(CAN_INT_vect) {
     uint8_t bitmask = ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // data page 0
     CANPAGE &= bitmask; // set data page 0
     uint8_t dataLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC
+
     // allocate enough space for the data block
     int i;
     for(i=0;i<maxDataLength;i++) {
@@ -95,12 +96,12 @@ ISR(CAN_INT_vect) {
     for (i = 0; i < maxDataLength; ++i) {
         //while data remains, read it
         receivedData[i] = CANMSG;
-
-        // display received data on LEDs
-        //PORTB = data[i];
-        //_delay_ms(100);
     }
-    //_delay_ms(200);
+    if (receivedData[0] == 0xFF) {
+        PORTB = 0xFF;
+    } else {
+        PORTB = 0x00;
+    }
 
     // set up MOb for reception
     CANCDMOB |= _BV(CONMOB1);
@@ -159,15 +160,6 @@ int main (void) {
     initCan();
 
     for (;;) {
-        // data has been correctly received if LED turns on and off every second
-        if (receivedData[0]!=0x55){
-            PORTB = 0xFF;
-        } else {
-            PORTB = 0x00;
-        } 
-
-        // send a msg every once in a while
-        //sendCANMsg();
         _delay_ms(50);
     }
 
