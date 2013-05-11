@@ -122,36 +122,6 @@ int sendCANMsg(int msg) {
     return(0);
 }
 
-// // handle CAN interrupt
-// // for testing purposes, assuming this is an RX interrupt
-// ISR(CAN_INT_vect) {
-//     char cSREG = SREG; //store SREG
-//     PORTB = 0xFF;
-//     CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
-
-//     uint8_t bitmask = ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // data page 0
-//     CANPAGE &= bitmask; // set data page 0
-//     uint8_t dataLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC
-//     // allocate enough space for the data block
-//     int i;
-//     for(i=0;i<maxDataLength;i++) {
-//         receivedData[i] = 0x00;
-//     }
-//     for (i = 0; i < maxDataLength; ++i) {
-//         //while data remains, read it
-//         receivedData[i] = CANMSG;
-
-//         // display received data on LEDs
-//         //PORTB = data[i];
-//         //_delay_ms(100);
-//     }
-//     //_delay_ms(200);
-
-//     // set up MOb for reception
-//     CANCDMOB |= _BV(CONMOB1);
-//     SREG=cSREG; //restore SREG
-// }
-
 int initButton() {
     EICRA = _BV(ISC00);
     EIMSK = _BV(INT0);
@@ -159,18 +129,23 @@ int initButton() {
 }
 
 // handle button press interrupt
-ISR(INT2_vect) {
+ISR(INT0_vect) {
     char cSREG = SREG; //store SREG
-    sendCANMsg(0);
-    _delay_ms(500);
-    sendCANMsg(1);
-    _delay_ms(500);
+    int val = PORTD & _BV(PD6);
+    if (val) {
+        sendCANMsg(1);
+    } else {
+        sendCANMsg(0);
+    }
     SREG=cSREG; //restore SREG
 }
 
 int main (void) {
     // set all PORTB pins for output
     DDRB |= 0xFF;
+    DDRD &= ~(_BV(PD6));
+    PORTD = 0x00;
+    PORTB = 0x00;
 
     // enable global interrupts
     sei();
@@ -178,14 +153,14 @@ int main (void) {
     // initialize CAN bus
     initCan();
     // intitialize button interrupts
-    //initButton();
+    initButton();
 
     for (;;) {
         // send a msg every once in a while
-        sendCANMsg(0);
+        /*sendCANMsg(0);
         _delay_ms(500);
         sendCANMsg(1);
-        _delay_ms(500);
+        _delay_ms(500);*/
     }
 
     //return 0;
