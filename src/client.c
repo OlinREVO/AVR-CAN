@@ -7,14 +7,17 @@
 
 #define maxDataLength 8
 
-/* TEST CAN CODE
-        For this test, we plan to use MOb0 as a receiver and MOb1
-    as a transmitter.
+/* TEST CAN CODE - CLIENT
+        MOb1 listens continuously for CAN messages. Based on the message content,
+        it drives PORTB high (for a message of 0xFF) or low (for 0x00).
+        PORTB should be connected to an LED so that it turns on or off when messages are received.
 */
 
 uint8_t receivedData[maxDataLength];
 uint8_t data[maxDataLength];
 
+
+// Set up and enable the CAN bus by initializing the relevant registers
 int initCan () {
 
     //Software reset
@@ -33,25 +36,18 @@ int initCan () {
         receivedData[i] = 0x00;
     }
 
-    // enable interrupts: all, receive
-    CANGIE = (_BV(ENIT) | _BV(ENRX));
-    // compatibility with future chips
-    CANIE1 = 0;
-    // enable interrupts on all MObs
-    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2));
+    CANGIE = (_BV(ENIT) | _BV(ENRX)); // enable interrupts: all, receive
+    CANIE1 = 0; // compatibility with future chips
+    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2)); // enable interrupts on all MObs
 
     int8_t mob;
     for (mob=0; mob<6; mob++ ) {
-        // Selects Message Object 0-5
-        CANPAGE = ( mob << 4 );
-        // Disable mob
-        CANCDMOB = 0x00;
-        // Clear mob status register;
-        CANSTMOB = 0x00;
+        CANPAGE = ( mob << 4 ); // Selects Message Object 0-5
+        CANCDMOB = 0x00; // Disable mob
+        CANSTMOB = 0x00; // Clear mob status register;
     }
 
-    // set up MOb2 for reception
-    CANPAGE = _BV(MOBNB1);
+    CANPAGE = _BV(MOBNB1); // set up MOb1 for reception
 
 
     // set compatibility registers to 0, RTR/IDE-mask to 1
@@ -66,8 +62,7 @@ int initCan () {
     CANIDM2 = 0x00;
     CANIDM1 = 0x00;
 
-    // enable reception, DLC8
-    CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
+    CANCDMOB = _BV(CONMOB1) | (8 << DLC0); // enable reception, DLC8
 
     // Enable mode: CAN channel enters in enable mode after 11 recessive bits
     CANGCON |= ( 1 << ENASTB );
@@ -81,7 +76,6 @@ int initCan () {
 // for testing purposes, assuming this is an RX interrupt
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
-    PORTB = 0xFF;
     CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
 
     uint8_t bitmask = ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // data page 0
@@ -97,71 +91,25 @@ ISR(CAN_INT_vect) {
         //while data remains, read it
         receivedData[i] = CANMSG;
     }
+
+    // act on LED on/off message
     if (receivedData[0] == 0xFF) {
         PORTB = 0xFF;
     } else {
         PORTB = 0x00;
     }
 
-    // set up MOb for reception
-    CANCDMOB |= _BV(CONMOB1);
+    CANCDMOB |= _BV(CONMOB1); // set up MOb for reception again
     SREG=cSREG; //restore SREG
 }
 
-int sendCANMsg() {
-    data[0] = 0x55; // test msg
-    uint8_t dataLength = 1; // only sending one test byte
-    // set MOb number (0 for testing) and auto-increment bits in CAN page MOb register
-    CANPAGE = ( _BV(AINC));
-
-    //Wait for MOb1 to be free
-    while(CANEN2 & (1 << ENMOB0));
-
-    CANEN2 |= (1 << ENMOB0); //Claim MOb1
-
-
-    //Clear MOb status register
-    CANSTMOB = 0x00;
-
-    CANMSG = data[0]; // set data page register
-
-    // set compatibility registers, RTR bit, and reserved bit to 0
-    CANIDT4 = 0;
-    CANIDT3 = 0;
-
-    // set ID tag registers
-    CANIDT2 = 0b10100000; // last 5 bits must be 0
-    CANIDT1 = 0b11001100;
-
-    CANCDMOB = (_BV(CONMOB0) | dataLength); // set transmit bit and data length bits of MOb control register
-
-//TODO: Figure out TXOK flag, use interrupts
-
-    //wait for TXOK
-    while((CANSTMOB & (1 << TXOK)) != (1 << TXOK));// & timeout--);
-
-    //Disable Transmission
-    CANCDMOB = 0x00;
-    //Clear TXOK flag (and all others)
-    CANSTMOB = 0x00;
-//End TODO
-
-    return(0);
-}
-
 int main (void) {
-    // set all PORTB pins for output
-    DDRB |= 0xFF;
-
-    // enable global interrupts
-    sei();
-
-    // initialize CAN bus
-    initCan();
+    DDRB |= 0xFF; // set all PORTB pins for output
+    sei(); // enable global interrupts
+    initCan(); // initialize CAN bus
 
     for (;;) {
+        // listen for CAN messages forever
     }
-
-    //return 0;
 }
 

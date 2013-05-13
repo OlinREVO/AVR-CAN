@@ -7,14 +7,16 @@
 
 #define maxDataLength 8
 
-/* TEST CAN CODE
-        For this test, we plan to use MOb0 as a receiver and MOb1
-    as a transmitter.
+/* TEST CAN CODE - SERVER
+        Listens for changes on INT0, which is connected to a momentary button.
+        When changes occur, an interrupt fires and it sends an appropriate message across the CAN bus.
+        If the pin is high, it sends 0xFF. If the pin is low, it sends 0x00.
 */
 
 uint8_t receivedData[maxDataLength];
 uint8_t data[maxDataLength];
 
+// Set up and enable the CAN bus by initializing the relevant registers
 int initCan () {
 
     //Software reset
@@ -77,6 +79,8 @@ int initCan () {
     return(0);
 }
 
+// Sends a message across the CAN bus.
+// Accepts an int msg. If msg is 0, it sends 0x00. Otherwise, it sends 0xFF.
 int sendCANMsg(int msg) {
     if (msg) {
         data[0] = 0xFF; // 0b11111111
@@ -122,12 +126,16 @@ int sendCANMsg(int msg) {
     return(0);
 }
 
+
+// Set up external interrupts for INT0 for any logical change
 int initButton() {
     EICRA = _BV(ISC00);
     EIMSK = _BV(INT0);
     return(0);
 }
 
+// Interrupt routine for External Interrupt 0 (fires when pin 14 changes)
+// Reads the value of pin 14 and sends an appropriate CAN message.
 ISR(INT0_vect) {
     char cSREG = SREG; //store SREG
     int val = PIND & _BV(PD6);
@@ -142,20 +150,15 @@ ISR(INT0_vect) {
 }
 
 int main (void) {
-    // set all PORTB pins for output
-    DDRB |= 0xFF;
-    DDRD &= ~(_BV(PD6));
-    //PORTD = 0x00;
+    DDRB |= 0xFF; // set all PORTB pins for output
+    DDRD &= ~(_BV(PD6)); // set pin 14 for input
     //PORTB = 0x00;
 
-    // enable global interrupts
-    sei();
+    sei(); // enable global interrupts    
+    initCan(); // initialize CAN bus
+    initButton(); // intitialize button interrupts
 
-    // initialize CAN bus
-    initCan();
-    // intitialize button interrupts
-    initButton();
-
+    // listen for button presses forever
     for (;;) {
         // send a msg every once in a while
         // sendCANMsg(0);
@@ -163,7 +166,5 @@ int main (void) {
         // sendCANMsg(1);
         // _delay_ms(500);
     }
-
-    //return 0;
 }
 
