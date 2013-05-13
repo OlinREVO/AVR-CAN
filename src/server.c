@@ -128,26 +128,25 @@ int initButton() {
     return(0);
 }
 
-// handle button press interrupt
-// ISR(INT0_vect) {
-//     char cSREG = SREG; //store SREG
-//     int val = PIND & _BV(PD6);
-//     if (val) {
-//         // sendCANMsg(1);
-//         PORTB = 0xFF;
-//     } else {
-//         // sendCANMsg(0);
-//         PORTB = 0x00;
-//     }
-//     SREG=cSREG; //restore SREG
-// }
+ISR(INT0_vect) {
+    char cSREG = SREG; //store SREG
+    int val = PIND & _BV(PD6);
+    if (val) {
+        sendCANMsg(1);
+        // PORTB = 0xFF;
+    } else {
+        sendCANMsg(0);
+        // PORTB = 0x00;
+    }
+    SREG=cSREG; //restore SREG
+}
 
 int main (void) {
     // set all PORTB pins for output
     DDRB |= 0xFF;
     DDRD &= ~(_BV(PD6));
     //PORTD = 0x00;
-    PORTB = 0x00;
+    //PORTB = 0x00;
 
     // enable global interrupts
     sei();
@@ -155,14 +154,14 @@ int main (void) {
     // initialize CAN bus
     initCan();
     // intitialize button interrupts
-    // initButton();
+    initButton();
 
     for (;;) {
         // send a msg every once in a while
-        sendCANMsg(0);
-        _delay_ms(500);
-        sendCANMsg(1);
-        _delay_ms(500);
+        // sendCANMsg(0);
+        // _delay_ms(500);
+        // sendCANMsg(1);
+        // _delay_ms(500);
     }
 
     //return 0;
