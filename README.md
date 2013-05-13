@@ -1,7 +1,13 @@
-avrCAN
+AVR-CAN
 ======
 
-CAN bus message handler for the ATmega16M1
+CAN bus message handler for the ATmega16M1.
+
+Demo v1: can.c
+Sends a single message across the CAN bus to toggle an LED on and off.
+
+Demo v2: client.c, server.c
+Uses CAN to turn a remote LED on or off based on the state of a momentary button connected to a pin.
 
 To flash code onto an ATmega chip, run the following commands:
 * `make FILE=can flash` for demo v1
