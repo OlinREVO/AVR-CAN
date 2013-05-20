@@ -112,8 +112,7 @@ int sendCANMsg(int msg) {
 
     CANCDMOB = (_BV(CONMOB0) | dataLength); // set transmit bit and data length bits of MOb control register
 
-//TODO: Figure out TXOK flag, use interrupts
-
+    //TODO: use interrupts for this instead of while loop
     //wait for TXOK
     while((CANSTMOB & (1 << TXOK)) != (1 << TXOK));// & timeout--);
 
@@ -121,7 +120,6 @@ int sendCANMsg(int msg) {
     CANCDMOB = 0x00;
     //Clear TXOK flag (and all others)
     CANSTMOB = 0x00;
-//End TODO
 
     return(0);
 }
@@ -141,10 +139,8 @@ ISR(INT0_vect) {
     int val = PIND & _BV(PD6);
     if (val) {
         sendCANMsg(1);
-        // PORTB = 0xFF;
     } else {
         sendCANMsg(0);
-        // PORTB = 0x00;
     }
     SREG=cSREG; //restore SREG
 }
@@ -152,19 +148,13 @@ ISR(INT0_vect) {
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
-    //PORTB = 0x00;
 
     sei(); // enable global interrupts    
     initCan(); // initialize CAN bus
     initButton(); // intitialize button interrupts
 
-    // listen for button presses forever
     for (;;) {
-        // send a msg every once in a while
-        // sendCANMsg(0);
-        // _delay_ms(500);
-        // sendCANMsg(1);
-        // _delay_ms(500);
+        // listen for button presses forever
     }
 }
 
