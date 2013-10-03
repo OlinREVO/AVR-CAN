@@ -31,9 +31,12 @@
 #define MSG_critical        0;
 #define MSG_warning         1;
 #define MSG_speed           2;
-#define MSG_batteryLevel    3;
-#define MSG_batteryUsage    4;
+#define MSG_voltagelow		3;
+#define MSG_shunting		4;
 #define MSG_shutdown        5;
+
+//#define MSG_batteryLevel    3;
+//#define MSG_batteryUsage    4;
 
 // API Function Prototypes
 
