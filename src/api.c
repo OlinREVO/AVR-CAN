@@ -2,8 +2,87 @@
 
 // must be called before CAN can be used
 // Sample call: initCAN(NODE_speedometer);
-int initCAN(int nodeID) {
-    
+int initCAN(uint8_t nodeID) {
+    CANGCON = _BV(SWRES); //Software reset
+    CANTCON = 0x00; //CAN timing prescaler set to 0;
+
+    // Set baud rate to 1000kb (assuming 8Mhz IOclk)
+    CANBT1 = 0x1E;
+    CANBT2 = 0x04;
+    CANBT3 = 0x13;
+
+    // enable interrupts: all, receive
+    CANGIE = (_BV(ENIT) | _BV(ENRX));
+    // compatibility with future chips
+    CANIE1 = 0;
+    // enable interrupts on all MObs
+    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2));
+
+    int8_t mob;
+    for (mob=0; mob<6; mob++ ) {
+        // Selects Message Object 0-5
+        CANPAGE = ( mob << 4 );
+        // Disable mob
+        CANCDMOB = 0x00;
+        // Clear mob status register;
+        CANSTMOB = 0x00;
+    }
+
+    // set up MOb1 for reception
+    CANPAGE = _BV(MOBNB1);
+
+    // MOb ID/IDmsk settings
+    // set compatibility registers to 0, RTR/IDE-mask to 1
+    CANIDM4 = (_BV(RTRMSK) | _BV(IDEMSK)); // write to 0x00?
+    CANIDT4 = 0x00;
+    CANIDM3 = 0x00;
+    CANIDT3 = 0x00;
+    // accept all message IDs (bits 0-5)
+    // accept only this node's node ID (bits 6-10)
+    CANIDM2 = 0x00;
+    CANIDT2 = 0x00;
+    CANIDM1 = 0xF8; // 0b11111000
+    CANIDM1 = ((nodeID & 0x1F) << 3); // node ID
+
+    // enable reception, DLC8
+    CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
+
+    // Enable mode: CAN channel enters in enable mode after 11 recessive bits
+    //  This should always be last in the init method
+    CANGCON |= ( 1 << ENASTB );
+
+// TODO: set ID tags and masks for msgs this MOb can accept
+
+    return(0);
+}
+
+// reads the data and other parameters from a receiving MOb and passes this
+//  data over to the implementation of handleCANmsg.
+// should not be called by external methods
+void readMsg() {
+    CANPAGE &= ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // set data page 0
+    uint8_t msgLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC (0b1111)
+    char* receivedMsg;
+
+    // read the data into a local memory block
+    receivedMsg = (char*)malloc(sizeof(char)*msgLength);
+    int i;
+    for (i = 0; i < msgLength; ++i) {
+        //while data remains, read it
+        receivedMsg[i] = CANMSG;
+    }
+
+    // take all of IDT1 and the first 3 bits of IDT2
+    uint16_t idtag = (_BV(CANIDT1) << 3) | ((_BV(CANIDT2) & 0xE0) >> 5);
+    uint8_t nodeID = (idtag & 0x07C0); // nodeID is bits 6-10 (0b11111000000)
+    uint8_t msgID = (idtag & 0x003F); // msgID is bits 0-5 (0b111111)
+
+    // externally-defined handler method
+    handleCANmsg(nodeID,msgID,receivedMsg,msgLength);
+
+    free(receivedMsg); // don't want any memory leaks
+
+    CANCDMOB |= _BV(CONMOB1); // set up MOb for reception again
 }
 
 // Sample call: sendCANmsg(NODE_watchdog,MSG_critical,data,dataLen);
@@ -51,44 +130,16 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLength) {
 // handles the CAN interrupts depending on what kind of interrupt it is
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
-    if (CANSTMOD & _BV(RXOK)) {
+    if (CANSTMOB & _BV(RXOK)) {
         CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
         readMsg();
-    } else if (CANSTMOD & _BV(TXOK)) {
+    } else if (CANSTMOB & _BV(TXOK)) {
         CANSTMOB &= ~(_BV(RXOK)); // reset transmit interrupt flag
     } else {
         CANSTMOB &= 0; // unknown interrupt
     }
     
     SREG=cSREG; //restore SREG
-}
-
-// reads the data and other parameters from a receiving MOb and passes this
-//  data over to the implementation of handleCANmsg.
-void readMsg(void) {
-    CANPAGE &= ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // set data page 0
-    uint8_t msgLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC (0b1111)
-    char* receivedMsg;
-
-    // read the data into a local memory block
-    receivedMsg = (char*)malloc(sizeof(char)*msgLength);
-    int i;
-    for (i = 0; i < msgLength; ++i) {
-        //while data remains, read it
-        receivedMsg[i] = CANMSG;
-    }
-
-    // take all of IDT1 and the first 3 bits of IDT2
-    uint16_t idtag = (_BV(CANIDT1) << 3) | ((_BV(CANIDT2) & 0xE0) >> 5);
-    uint8_t nodeID = (idtag & 0x07C0); // nodeID is bits 6-10 (0b11111000000)
-    uint8_t msgID = (idtag & 0x003F); // msgID is bits 0-5 (0b111111)
-
-    // externally-defined handler method
-    handleCANmsg(nodeID,msgID,receivedMsg,msgLength);
-
-    free(receivedMsg); // don't want any memory leaks
-
-    CANCDMOB |= _BV(CONMOB1); // set up MOb for reception again
 }
 
 /* must be implemented by user - this is just a sample implementation

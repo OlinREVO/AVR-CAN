@@ -62,7 +62,7 @@ $(OUTDIR)/%.elf: $(OBJECTS)
 $(OUTDIR)/%.hex: $(OUTDIR)/%.elf
 	$(OBJCOPY) -O ihex -R .eeprom $< $@
 
-$(OUTDIR)/%.o: src/%.c | $(OUTDIR)
+$(OUTDIR)/%.o: src/%.c | $(OUTDIR) $(INCLUDES)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 %.lst: %.c

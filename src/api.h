@@ -31,11 +31,11 @@
 
 
 /* Definitions for node IDs and message IDs.
-/* Please feel free to add IDs as necessary, but make sure
+ * Please feel free to add IDs as necessary, but make sure
  *  to synchronize this file between all nodes
  *
  * NODE: max of 5 bits
- * MSG: max of 6 bihs
+ * MSG: max of 6 bits
  */
 #define NODE_watchdog       0;
 #define NODE_bms            1;
@@ -60,7 +60,7 @@
  * must be called before CAN can be used
  * Sample call: initCAN(NODE_speedometer);
  */
-int initCAN(int nodeID);
+int initCAN(uint8_t nodeID);
 
 /* implemented in api.c
  * Sample call: sendCANmsg(NODE_watchdog,MSG_critical,data,dataLen);
