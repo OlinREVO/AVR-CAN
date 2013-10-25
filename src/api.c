@@ -59,7 +59,7 @@ int initCAN(uint8_t nodeID) {
 // reads the data and other parameters from a receiving MOb and passes this
 //  data over to the implementation of handleCANmsg.
 // should not be called by external methods
-void readMsg() {
+void readMsg(void) {
     CANPAGE &= ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // set data page 0
     uint8_t msgLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC (0b1111)
     char* receivedMsg;

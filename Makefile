@@ -13,6 +13,8 @@ TARGET = $(FILE)
 MCU = atmega16m1
 # SOURCES: list of input source sources
 SOURCES = $(FILE).c
+# INC: list of build dependencies
+INC = -Isrc/
 # OUTDIR: directory to use for output
 OUTDIR = build
 # PROGRAMMER: name of programmer
@@ -21,7 +23,7 @@ PROGRAMMER = avrispmkII
 # PORT: location of programmer
 PORT = usb
 # define flags
-CFLAGS = -mmcu=$(MCU) -g -Os -Wall -Wunused
+CFLAGS = -mmcu=$(MCU) -g -Os -Wall -Wunused $(INC)
 ASFLAGS = -mmcu=$(MCU) -x assembler-with-cpp -Wa,-gstabs
 LDFLAGS = -mmcu=$(MCU) -Wl,-Map=$(OUTDIR)/$(TARGET).map
 AVRDUDE_FLAGS = -p $(MCU) -v -c $(PROGRAMMER) -P $(PORT)
@@ -62,7 +64,7 @@ $(OUTDIR)/%.elf: $(OBJECTS)
 $(OUTDIR)/%.hex: $(OUTDIR)/%.elf
 	$(OBJCOPY) -O ihex -R .eeprom $< $@
 
-$(OUTDIR)/%.o: src/%.c | $(OUTDIR) $(INCLUDES)
+$(OUTDIR)/%.o: src/%.c | $(OUTDIR)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 %.lst: %.c

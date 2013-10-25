@@ -37,19 +37,22 @@
  * NODE: max of 5 bits
  * MSG: max of 6 bits
  */
-#define NODE_watchdog       0;
-#define NODE_bms            1;
-#define NODE_speedometer    2;
-#define NODE_halleffect     3;
-#define NODE_sdlogger       4;
+#define NODE_watchdog       (uint8_t) 0x0
+#define NODE_bms            (uint8_t) 0x1
+#define NODE_speedometer    (uint8_t) 0x2
+#define NODE_halleffect     (uint8_t) 0x3
+#define NODE_sdlogger       (uint8_t) 0x4
+#define NODE_demoClient     (uint8_t) 0xA
+#define NODE_demoServer     (uint8_t) 0xB
 
-#define MSG_critical        0;
-#define MSG_warning         1;
-#define MSG_speed           2;
-#define MSG_voltagelow		3;
-#define MSG_shunting		4;
-#define MSG_shutdown        5;
-#define MSG_data_other      6;
+#define MSG_critical        (uint8_t) 0x0
+#define MSG_warning         (uint8_t) 0x1
+#define MSG_speed           (uint8_t) 0x2
+#define MSG_voltagelow		(uint8_t) 0x3
+#define MSG_shunting		(uint8_t) 0x4
+#define MSG_shutdown        (uint8_t) 0x5
+#define MSG_data_other      (uint8_t) 0x6
+#define MSG_demoMsg         (uint8_t) 0xA
 
 //#define MSG_batteryLevel    3;
 //#define MSG_batteryUsage    4;
