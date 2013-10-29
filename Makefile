@@ -12,7 +12,7 @@ TARGET = $(FILE)
 # MCU: part number to build for
 MCU = atmega16m1
 # SOURCES: list of input source sources
-SOURCES = $(FILE).c
+SOURCES = $(FILE).c api.c
 # INC: list of build dependencies
 INC = -Isrc/
 # OUTDIR: directory to use for output

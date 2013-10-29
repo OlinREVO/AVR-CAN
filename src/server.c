@@ -27,13 +27,22 @@ int initButton() {
 ISR(INT0_vect) {
     char cSREG = SREG; //store SREG
     int val = PIND & _BV(PD6);
+    char* msg = (char*)malloc(sizeof(char));
     if (val) {
-        // sendCANMsg(1);
+        msg[0] = 0x01;
     } else {
-        // sendCANMsg(0);
+        msg[0] = 0x00;
     }
+    sendCANmsg(NODE_demoClient, MSG_demoMsg, msg, 1);
+    free(msg);
     SREG=cSREG; //restore SREG
 }
+
+/* api.c requires an implementation of this method. However, the server node
+ * does not expect to receive any messages, so if this occurs, then it just
+ * ignores the message. Acceptable for a demo node.
+ */
+void handleCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen) { }
 
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output

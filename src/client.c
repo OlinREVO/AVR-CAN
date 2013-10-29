@@ -26,7 +26,7 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen) {
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output
     sei(); // enable global interrupts
-    // initCAN(NODE_demoClient); // initialize CAN bus
+    initCAN(NODE_demoClient); // initialize CAN bus
 
     for (;;) {
         // listen for CAN messages forever
