@@ -29,7 +29,7 @@ ISR(INT0_vect) {
     int val = PIND & _BV(PD6);
     char* msg = (char*)malloc(sizeof(char));
     if (val) {
-        msg[0] = 0x01;
+        msg[0] = 0xFF;
     } else {
         msg[0] = 0x00;
     }
