@@ -109,7 +109,7 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLength) {
     CANIDT3 = 0;
 
     // set ID tag registers
-    uint8_t idtag = ((destID & 0x1F) << 6) | (msgID & 0x3F);
+    uint16_t idtag = ((destID & 0x1F) << 6) | (msgID & 0x3F);
     CANIDT2 = ((idtag & 0x07) << 5); // bits 0-2 of idtag (0b0111)
     CANIDT1 = ((idtag & 0x7F8) >> 3); // bits 3-10 of idtag (0b11111111000)
 

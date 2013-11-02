@@ -27,11 +27,11 @@ int initButton() {
 ISR(INT0_vect) {
     char cSREG = SREG; //store SREG
     int val = PIND & _BV(PD6);
-    char* msg = (char*)malloc(sizeof(char));
+    char* msg = (char*)malloc(6*sizeof(char));
     if (val) {
-        msg[0] = 0xFF;
+        *msg = 0xFF;
     } else {
-        msg[0] = 0x00;
+        *msg = 0x00;
     }
     sendCANmsg(NODE_demoClient, MSG_demoMsg, msg, 1);
     free(msg);

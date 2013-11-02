@@ -16,7 +16,7 @@
 */
 
 void handleCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen) {
-    if (msg[0]==0xFF) {
+    if (*msg==0xFF) {
         PORTB = 0xFF;
     } else {
         PORTB = 0x00;
