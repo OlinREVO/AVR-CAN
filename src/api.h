@@ -68,13 +68,13 @@ int initCAN(uint8_t nodeID);
 /* implemented in api.c
  * Sample call: sendCANmsg(NODE_watchdog,MSG_critical,data,dataLen);
  */
-int sendCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen);
+int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen);
 
 /* must be implemented by user. A sample implementation is included in
  *  a block comment in api.c
  * make sure not to do any heavy computation in this method, since it
  *  will be called from an ISR and will delay your main loop
  */
-void handleCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen);
+void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen);
 
 #endif

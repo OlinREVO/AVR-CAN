@@ -27,7 +27,7 @@ int initButton() {
 ISR(INT0_vect) {
     char cSREG = SREG; //store SREG
     int val = PIND & _BV(PD6);
-    char* msg = (char*)malloc(6*sizeof(char));
+    uint8_t* msg = (char*)malloc(8*sizeof(char));
     if (val) {
         *msg = 0xFF;
     } else {

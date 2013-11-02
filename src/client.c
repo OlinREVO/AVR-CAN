@@ -15,12 +15,9 @@
         PORTB should be connected to an LED so that it turns on or off when messages are received.
 */
 
-void handleCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen) {
-    if (*msg==0xFF) {
-        PORTB = 0xFF;
-    } else {
-        PORTB = 0x00;
-    }
+void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
+    uint8_t cmd = *msg;
+    PORTB = cmd;
 }
 
 int main (void) {

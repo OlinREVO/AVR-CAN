@@ -28,7 +28,7 @@ int initCAN(uint8_t nodeID) {
         CANSTMOB = 0x00;
     }
 
-    // set up MOb1 for reception
+    // set up MOb2 for reception
     CANPAGE = _BV(MOBNB1);
 
     // MOb ID/IDmsk settings
@@ -42,7 +42,7 @@ int initCAN(uint8_t nodeID) {
     CANIDM2 = 0x00;
     CANIDT2 = 0x00;
     CANIDM1 = 0xF8; // 0b11111000
-    CANIDM1 = ((nodeID & 0x1F) << 3); // node ID
+    CANIDT1 = ((nodeID & 0x1F) << 3); // node ID
 
     // enable reception, DLC8
     CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
@@ -60,12 +60,12 @@ int initCAN(uint8_t nodeID) {
 //  data over to the implementation of handleCANmsg.
 // should not be called by external methods
 void readMsg(void) {
-    CANPAGE &= ~(_BV(INDX2) & _BV(INDX1) & _BV(INDX0)); // set data page 0
+    CANPAGE &= ~(_BV(AINC) | _BV(INDX2) | _BV(INDX1) | _BV(INDX0)); // set data page 0
     uint8_t msgLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC (0b1111)
-    char* receivedMsg;
+    uint8_t* receivedMsg;
 
     // read the data into a local memory block
-    receivedMsg = (char*)malloc(sizeof(char)*msgLength);
+    receivedMsg = (uint8_t*)malloc(sizeof(char)*msgLength);
     int i;
     for (i = 0; i < msgLength; ++i) {
         //while data remains, read it
@@ -86,7 +86,7 @@ void readMsg(void) {
 }
 
 // Sample call: sendCANmsg(NODE_watchdog,MSG_critical,data,dataLen);
-int sendCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLength) {
+int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLength) {
     // set MOb number (0 for testing) and auto-increment bits in CAN page MOb register
     CANPAGE = ( _BV(AINC));
 
