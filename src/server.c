@@ -27,7 +27,7 @@ int initButton() {
 ISR(INT0_vect) {
     char cSREG = SREG; //store SREG
     int val = PIND & _BV(PD6);
-    uint8_t* msg = (char*)malloc(8*sizeof(char));
+    uint8_t* msg = (uint8_t*)malloc(8*sizeof(uint8_t));
     if (val) {
         *msg = 0xFF;
     } else {
@@ -42,7 +42,7 @@ ISR(INT0_vect) {
  * does not expect to receive any messages, so if this occurs, then it just
  * ignores the message. Acceptable for a demo node.
  */
-void handleCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen) { }
+void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) { }
 
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output

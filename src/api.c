@@ -65,7 +65,7 @@ void readMsg(void) {
     uint8_t* receivedMsg;
 
     // read the data into a local memory block
-    receivedMsg = (uint8_t*)malloc(sizeof(char)*msgLength);
+    receivedMsg = (uint8_t*)malloc(sizeof(uint8_t)*msgLength);
     int i;
     for (i = 0; i < msgLength; ++i) {
         //while data remains, read it
