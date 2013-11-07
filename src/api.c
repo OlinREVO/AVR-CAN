@@ -28,7 +28,7 @@ int initCAN(uint8_t nodeID) {
         CANSTMOB = 0x00;
     }
 
-    // set up MOb2 for reception
+    // set up MOb1 for reception of this node's messages
     CANPAGE = _BV(MOBNB1);
 
     // MOb ID/IDmsk settings
@@ -43,6 +43,25 @@ int initCAN(uint8_t nodeID) {
     CANIDT2 = 0x00;
     CANIDM1 = 0xF8; // 0b11111000
     CANIDT1 = ((nodeID & 0x1F) << 3); // node ID
+
+    // enable reception, DLC8
+    CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
+
+    // set up MOb2 for reception of this broadcast messages
+    CANPAGE = _BV(MOBNB2);
+
+    // MOb ID/IDmsk settings
+    // set compatibility registers to 0, RTR/IDE-mask to 1
+    CANIDM4 = (_BV(RTRMSK) | _BV(IDEMSK)); // write to 0x00?
+    CANIDT4 = 0x00;
+    CANIDM3 = 0x00;
+    CANIDT3 = 0x00;
+    // accept all message IDs (bits 0-5)
+    // accept only the broadcast node ID (bits 6-10)
+    CANIDM2 = 0x00;
+    CANIDT2 = 0x00;
+    CANIDM1 = 0xF8; // 0b11111000
+    CANIDT1 = ((NODE_broadcast & 0x1F) << 3); // broadcast ID
 
     // enable reception, DLC8
     CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
@@ -87,7 +106,7 @@ void readMsg(void) {
 
 // Sample call: sendCANmsg(NODE_watchdog,MSG_critical,data,dataLen);
 int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLength) {
-    // set MOb number (0 for testing) and auto-increment bits in CAN page MOb register
+    // use MOb 0 for sending and auto-increment bits in CAN page MOb register
     CANPAGE = ( _BV(AINC));
 
     //Wait for MOb1 to be free

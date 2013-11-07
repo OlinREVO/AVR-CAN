@@ -29,7 +29,6 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 
-
 /* Definitions for node IDs and message IDs.
  * Please feel free to add IDs as necessary, but make sure
  *  to synchronize this file between all nodes
@@ -39,9 +38,10 @@
  */
 #define NODE_watchdog       ((uint8_t) 0x0)
 #define NODE_bms            ((uint8_t) 0x1)
-#define NODE_speedometer    ((uint8_t) 0x2)
-#define NODE_halleffect     ((uint8_t) 0x3)
-#define NODE_sdlogger       ((uint8_t) 0x4)
+#define NODE_broadcast      ((uint8_t) 0x2) // All nodes listen for a broadcast
+#define NODE_speedometer    ((uint8_t) 0x3)
+#define NODE_halleffect     ((uint8_t) 0x4)
+#define NODE_sdlogger       ((uint8_t) 0x5)
 #define NODE_demoClient     ((uint8_t) 0xA)
 #define NODE_demoServer     ((uint8_t) 0xB)
 
