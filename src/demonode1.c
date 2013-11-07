@@ -9,11 +9,13 @@
 
 #define maxDataLength 8
 
-/* TEST CAN CODE - SERVER
+/* TEST CAN CODE - DEMO NODE 1
         Listens for changes on INT0, which is connected to a momentary button.
         When changes occur, an interrupt fires and it sends an appropriate message across the CAN bus.
         If the pin is high, it sends 0xFF. If the pin is low, it sends 0x00.
 */
+
+// TODO: set up 2 more external interrupts
 
 // Set up external interrupts for INT0 for any logical change
 int initButton() {
@@ -21,6 +23,8 @@ int initButton() {
     EIMSK = _BV(INT0);
     return(0);
 }
+
+// TODO: add 2 more ISRs for the other boards (+ the broadcast channel)
 
 // Interrupt routine for External Interrupt 0 (fires when pin 14 changes)
 // Reads the value of pin 14 and sends an appropriate CAN message.
@@ -33,16 +37,16 @@ ISR(INT0_vect) {
     } else {
         *msg = 0x00;
     }
-    sendCANmsg(NODE_demoClient, MSG_demoMsg, msg, 1);
+    sendCANmsg(NODE_broadcast, MSG_demoMsg, msg, 1);
     free(msg);
     SREG=cSREG; //restore SREG
 }
 
-/* api.c requires an implementation of this method. However, the server node
- * does not expect to receive any messages, so if this occurs, then it just
- * ignores the message. Acceptable for a demo node.
- */
-void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) { }
+// TODO: change this method for each of the demo nodes
+void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
+    uint8_t cmd = *msg;
+    PORTB = cmd;
+}
 
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output

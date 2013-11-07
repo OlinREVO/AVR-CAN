@@ -44,6 +44,9 @@
 #define NODE_sdlogger       ((uint8_t) 0x5)
 #define NODE_demoClient     ((uint8_t) 0xA)
 #define NODE_demoServer     ((uint8_t) 0xB)
+#define NODE_demoNode1      ((uint8_t) 0xC)
+#define NODE_demoNode2      ((uint8_t) 0xD)
+#define NODE_demoNode3      ((uint8_t) 0xE)
 
 #define MSG_critical        ((uint8_t) 0x0)
 #define MSG_warning         ((uint8_t) 0x1)
