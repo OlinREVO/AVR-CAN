@@ -53,12 +53,12 @@ ISR(INT0_vect) {
 // Turns on broadcast LED
 ISR(INT1_vect) {
     char cSREG = SREG; //store SREG
-    int val = PIND & _BV(PD6);
+    int val = PIND & _BV(PB2);
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
-        *msg = 0b11; // turn lower LED on
+        *msg = 0b11; // turns both lower LEDs on
     } else {
-        *msg = 0b10; // turn lower LED off
+        *msg = 0b10; // turns both lower LEDs off
     }
     sendCANmsg(NODE_broadcast, MSG_demoMsg, msg, 1);
     free(msg);
@@ -76,7 +76,7 @@ ISR(INT1_vect) {
 // Turns on demo3 LED
 ISR(INT3_vect) {
     char cSREG = SREG; //store SREG
-    int val = PIND & _BV(PD6);
+    int val = PIND & _BV(PC0);
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
         *msg = 0b11; // turn lower LED on
