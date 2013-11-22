@@ -3,6 +3,8 @@
 // must be called before CAN can be used
 // Sample call: initCAN(NODE_speedometer);
 int initCAN(uint8_t nodeID) {
+    sei(); // enable global interrupts
+    
     CANGCON = _BV(SWRES); //Software reset
     CANTCON = 0x00; //CAN timing prescaler set to 0;
 
