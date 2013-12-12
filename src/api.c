@@ -155,7 +155,7 @@ ISR(CAN_INT_vect) {
         CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
         readMsg();
     } else if (CANSTMOB & _BV(TXOK)) {
-        CANSTMOB &= ~(_BV(RXOK)); // reset transmit interrupt flag
+        CANSTMOB &= ~(_BV(TXOK)); // reset transmit interrupt flag
     } else {
         CANSTMOB &= 0; // unknown interrupt
     }
