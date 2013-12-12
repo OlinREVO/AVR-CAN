@@ -13,7 +13,10 @@ Each node implementing this API has access to 2 methods (initCan and sendCANmsg)
 
 Using this API in your project
 -----
-In order to use this API, you need to implement handleCANmsg, even if you do not intend to send any messages to a given chip. Make sure to include api.c in the sources in your Makefile.
+In order to use this API, you need to implement handleCANmsg, even if you do not intend to send any messages to a given chip. Make sure to include the following in your Makefile: 
+SOURCES += api.c
+INC += -Isrc/
+CFLAGS += $(INC)
 
 Demo Code
 -----
