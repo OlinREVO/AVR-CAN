@@ -54,13 +54,20 @@ ISR(INT0_vect) {
 ISR(INT1_vect) {
     char cSREG = SREG; //store SREG
     int val = PIND & _BV(PB2);
+
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
-        *msg = 0b01; // turns both upper LEDs on
+        *msg = 0b11; // turns lower LED on
     } else {
-        *msg = 0b00; // turns both upper LEDs off
+        *msg = 0b10; // turns lower LED off
     }
-    sendCANmsg(NODE_broadcast, MSG_demoMsg, msg, 1);
+    sendCANmsg(NODE_demoNode1, MSG_demoMsg, msg, 1);
+    if (val) {
+        *msg = 0b01; // turns upper LED on
+    } else {
+        *msg = 0b00; // turns upper LED off
+    }
+    sendCANmsg(NODE_demoNode2, MSG_demoMsg, msg, 1);
     free(msg);
     // int btnState = (PINB & _BV(PB2));
     // if (btnState) {
@@ -79,11 +86,11 @@ ISR(INT3_vect) {
     int val = PIND & _BV(PC0);
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
-        *msg = 0b01; // turn lower LED on
+        *msg = 0b01; // turn upper LED on
     } else {
-        *msg = 0b00; // turn lower LED off
+        *msg = 0b00; // turn upper LED off
     }
-    sendCANmsg(NODE_demoNode3, MSG_demoMsg, msg, 1);
+    sendCANmsg(NODE_demoNode2, MSG_demoMsg, msg, 1);
     free(msg);
     // int btnState = (PINC & _BV(PC0));
     // if (btnState) {
@@ -121,7 +128,7 @@ int main (void) {
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
 
     sei(); // enable global interrupts    
-    initCAN(NODE_demoNode1); // initialize CAN bus
+    initCAN(NODE_demoNode3); // initialize CAN bus
     initButton(); // intitialize button interrupts
 
     for (;;) {

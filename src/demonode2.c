@@ -121,7 +121,7 @@ int main (void) {
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
 
     sei(); // enable global interrupts    
-    initCAN(NODE_demoNode1); // initialize CAN bus
+    initCAN(NODE_demoNode2); // initialize CAN bus
     initButton(); // intitialize button interrupts
 
     for (;;) {
