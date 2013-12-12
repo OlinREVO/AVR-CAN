@@ -119,6 +119,7 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
             PORTB &= ~(_BV(PB6));
         }
     }
+    PORTB|=_BV(PB3);
 }
 
 int main (void) {
