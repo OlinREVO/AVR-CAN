@@ -105,7 +105,7 @@ ISR(INT3_vect) {
 void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = *msg;
     int ledOn = cmd & 0b01;
-    int whichLED = cmd & 0b10;
+    int whichLED = cmd & 0b00;
     if (whichLED) {
         if (ledOn) {
             PORTB |= _BV(PB4);
@@ -119,7 +119,6 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
             PORTB &= ~(_BV(PB6));
         }
     }
-    PORTB|=_BV(PB3);
 }
 
 int main (void) {

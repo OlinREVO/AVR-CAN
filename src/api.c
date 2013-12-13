@@ -43,13 +43,13 @@ int initCAN(uint8_t nodeID) {
     // accept only this node's node ID (bits 6-10)
     CANIDM2 = 0x00;
     CANIDT2 = 0x00;
-    CANIDM1 = 0xF8; // 0b11111000
+    CANIDM1 = 0x00; // 0b11111000
     CANIDT1 = ((nodeID & 0x1F) << 3); // node ID
 
     // enable reception, DLC8
     CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
 
-    // set up MOb2 for reception of this broadcast messages
+/*    // set up MOb2 for reception of this broadcast messages
     CANPAGE = _BV(MOBNB2);
 
     // MOb ID/IDmsk settings
@@ -66,7 +66,7 @@ int initCAN(uint8_t nodeID) {
     CANIDT1 = ((NODE_broadcast & 0x1F) << 3); // broadcast ID
 
     // enable reception, DLC8
-    CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
+    CANCDMOB = _BV(CONMOB1) | (8 << DLC0);*/
 
     // Enable mode: CAN channel enters in enable mode after 11 recessive bits
     //  This should always be last in the init method
@@ -151,6 +151,7 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLength) {
 // handles the CAN interrupts depending on what kind of interrupt it is
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
+    PORTB|=_BV(PB3);
     if (CANSTMOB & _BV(RXOK)) {
         CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
         readMsg();
