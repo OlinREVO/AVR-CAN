@@ -12,9 +12,9 @@ TARGET = $(FILE)
 # MCU: part number to build for
 MCU = atmega16m1
 # SOURCES: list of input source sources
-SOURCES = $(FILE).c api.c
+SOURCES = $(FILE).c api.c UART/uart.c
 # INC: list of build dependencies
-INC = -Isrc/
+INC = -Isrc/ -Isrc/UART/
 # OUTDIR: directory to use for output
 OUTDIR = build
 # PROGRAMMER: name of programmer
@@ -27,6 +27,7 @@ CFLAGS = -mmcu=$(MCU) -g -Os -Wall -Wunused $(INC)
 ASFLAGS = -mmcu=$(MCU) -x assembler-with-cpp -Wa,-gstabs
 LDFLAGS = -mmcu=$(MCU) -Wl,-Map=$(OUTDIR)/$(TARGET).map
 AVRDUDE_FLAGS = -p $(MCU) -v -c $(PROGRAMMER) -P $(PORT)
+
 #######################################
 # end of user configuration
 #######################################
@@ -65,6 +66,7 @@ $(OUTDIR)/%.hex: $(OUTDIR)/%.elf
 	$(OBJCOPY) -O ihex -R .eeprom $< $@
 
 $(OUTDIR)/%.o: src/%.c | $(OUTDIR)
+	$(MKDIR) $(OUTDIR)/UART
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 %.lst: %.c
@@ -83,4 +85,4 @@ verify: $(OUTDIR)/$(TARGET).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -U flash:v:$<
 
 clean:
-	-$(RM) $(OUTDIR)/*
+	-$(RM) -r $(OUTDIR)/*

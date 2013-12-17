@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "api.h"
+#include "uart.h"
 
 #define maxDataLength 8
 

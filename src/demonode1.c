@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "api.h"
+#include "uart.h"
 
 #define maxDataLength 8
 
@@ -47,7 +48,7 @@ ISR(INT0_vect) {
     // }
     SREG=cSREG; //restore SREG
 }
-
+ 
 // Interrupt routine for External Interrupt 1 (fires when pin 16 changes)
 // Reads the value of pin 16 and sends an appropriate CAN message.
 // Turns on broadcast LED
@@ -62,6 +63,7 @@ ISR(INT1_vect) {
     }
     sendCANmsg(NODE_broadcast, MSG_demoMsg, msg, 1);
     free(msg);
+
     // int btnState = (PINB & _BV(PB2));
     // if (btnState) {
     //     PORTB |= _BV(PB4);
