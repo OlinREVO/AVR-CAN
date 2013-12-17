@@ -54,7 +54,7 @@ ISR(INT0_vect) {
 // Turns on broadcast LED
 ISR(INT1_vect) {
     char cSREG = SREG; //store SREG
-    int val = PIND & _BV(PB2);
+    int val = PINB & _BV(PB2);
 
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
@@ -84,7 +84,7 @@ ISR(INT1_vect) {
 // Turns on demo3 LED
 ISR(INT3_vect) {
     char cSREG = SREG; //store SREG
-    int val = PIND & _BV(PC0);
+    int val = PINC & _BV(PC0);
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
         *msg = 0b01; // turn upper LED on

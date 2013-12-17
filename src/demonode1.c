@@ -30,6 +30,8 @@ int initButton() {
 // Reads the value of pin 14 and sends an appropriate CAN message.
 // Turns on demo2 LED
 ISR(INT0_vect) {
+    //EICRA = 0;
+    //EIMSK = 0;
     char cSREG = SREG; //store SREG
     int val = PIND & _BV(PD6);
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
@@ -53,8 +55,10 @@ ISR(INT0_vect) {
 // Reads the value of pin 16 and sends an appropriate CAN message.
 // Turns on broadcast LED
 ISR(INT1_vect) {
+    //EICRA = 0;
+    //EIMSK = 0;
     char cSREG = SREG; //store SREG
-    int val = PIND & _BV(PB2);
+    int val = PINB & _BV(PB2);
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
         *msg = 0b11; // turns both lower LEDs on
@@ -77,8 +81,10 @@ ISR(INT1_vect) {
 // Reads the value of pin 30 and sends an appropriate CAN message.
 // Turns on demo3 LED
 ISR(INT3_vect) {
+    //EICRA = 0;
+    //EIMSK = 0;
     char cSREG = SREG; //store SREG
-    int val = PIND & _BV(PC0);
+    int val = PINC & _BV(PC0);
     uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
     if (val) {
         *msg = 0b11; // turn lower LED on
@@ -117,6 +123,8 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
 }
 
 int main (void) {
+
+    
     DDRB |= 0xFF; // set all PORTB pins for output
     DDRB &= ~(_BV(PB2)); // set pin 16 for input
     DDRC &= ~(_BV(PC0)); // set pin 30 for input
@@ -126,6 +134,8 @@ int main (void) {
     initCAN(NODE_demoNode1); // initialize CAN bus
     initButton(); // intitialize button interrupts
 
+    //initUART();
+    //UART_putString("Hello world");
     for (;;) {
         // listen for button presses forever
     }
