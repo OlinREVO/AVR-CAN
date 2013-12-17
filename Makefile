@@ -14,7 +14,7 @@ MCU = atmega16m1
 # SOURCES: list of input source sources
 SOURCES = $(FILE).c api.c UART/uart.c
 # INC: list of build dependencies
-INC = -Isrc/ -Isrc/UART/
+INC = -Isrc/
 # OUTDIR: directory to use for output
 OUTDIR = build
 # PROGRAMMER: name of programmer
@@ -66,7 +66,6 @@ $(OUTDIR)/%.hex: $(OUTDIR)/%.elf
 	$(OBJCOPY) -O ihex -R .eeprom $< $@
 
 $(OUTDIR)/%.o: src/%.c | $(OUTDIR)
-	$(MKDIR) $(OUTDIR)/UART
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 %.lst: %.c
