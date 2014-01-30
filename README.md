@@ -1,7 +1,7 @@
 AVR-CAN
 ======
 
-CAN bus message handler for the ATmega16M1.
+CAN bus message handler for the ATmega16M1
 
 CAN API
 -----
