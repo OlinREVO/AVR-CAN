@@ -9,7 +9,7 @@ int initCAN(uint8_t nodeID) {
     CANTCON = 0x00; //CAN timing prescaler set to 0;
 
     // Set baud rate to 1000kb (assuming 8Mhz IOclk)
-    CANBT1 = 0x1E;
+    CANBT1 = 0x1E; // change this to 0x08 for baud rate of 25000 for Logic debugging
     CANBT2 = 0x04;
     CANBT3 = 0x13;
 
