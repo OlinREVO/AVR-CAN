@@ -9,7 +9,7 @@ int initCAN(uint8_t nodeID) {
     CANTCON = 0x00; //CAN timing prescaler set to 0;
 
     // Set baud rate to 1000kb (assuming 8Mhz IOclk)
-    CANBT1 = 0x1E; // change this to 0x08 for baud rate of 25000 for Logic debugging
+    CANBT1 = 0x08; // change this to 0x08 for baud rate of 25000 for Logic debugging
     CANBT2 = 0x04;
     CANBT3 = 0x13;
 
@@ -83,10 +83,9 @@ int initCAN(uint8_t nodeID) {
 void readMsg(void) {
     CANPAGE &= ~(_BV(AINC) | _BV(INDX2) | _BV(INDX1) | _BV(INDX0)); // set data page 0
     uint8_t msgLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC (0b1111)
-    uint8_t* receivedMsg;
+    uint8_t receivedMsg[msgLength];
 
     // read the data into a local memory block
-    receivedMsg = (uint8_t*)malloc(sizeof(uint8_t)*msgLength);
     int i;
     for (i = 0; i < msgLength; ++i) {
         //while data remains, read it
@@ -101,13 +100,11 @@ void readMsg(void) {
     // externally-defined handler method
     handleCANmsg(nodeID,msgID,receivedMsg,msgLength);
 
-    free(receivedMsg); // don't want any memory leaks
-
     CANCDMOB |= _BV(CONMOB1); // set up MOb for reception again
 }
 
 // Sample call: sendCANmsg(NODE_watchdog,MSG_critical,data,dataLen);
-int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLength) {
+int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLength) {
     // use MOb 0 for sending and auto-increment bits in CAN page MOb register
     CANPAGE = ( _BV(AINC));
 
@@ -151,7 +148,7 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLength) {
 // handles the CAN interrupts depending on what kind of interrupt it is
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
-    PORTB|=_BV(PB3);
+
     if (CANSTMOB & _BV(RXOK)) {
         CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
         readMsg();

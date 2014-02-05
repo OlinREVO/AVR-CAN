@@ -78,6 +78,6 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen);
  * make sure not to do any heavy computation in this method, since it
  *  will be called from an ISR and will delay your main loop
  */
-void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen);
+void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLen);
 
 #endif

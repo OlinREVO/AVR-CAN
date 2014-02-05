@@ -16,22 +16,21 @@ NODE_ID = NODE_demoNode1;
 
 // Set up external interrupts for INT0 for any logical change
 int initButton() {
-    EICRA = _BV(ISC00) | _BV(ISC10) | _BV(ISC30);
-    EIMSK = _BV(INT0) | _BV(INT1) | _BV(INT3);
+    EICRA = _BV(ISC00) | _BV(ISC30);
+    EIMSK = _BV(INT0) | _BV(INT3);
 
     return(0);
 }
 
 void buttonScript(int val, uint8_t x, uint8_t y){
 char cSREG = SREG; //Store SREG
-    uint8_t* msg = (uint8_t*)malloc(1*sizeof(uint8_t));
+    uint8_t msg[1];
     if (val) {
-        *msg = x; // turn top LED on
+        msg[0] = x; // turn top LED on
     } else {
-        *msg = y; // turn top LED off
+        msg[0] = y; // turn top LED off
     }
     sendCANmsg(NODE_demoNode2, MSG_demoMsg, msg, 1);
-    free(msg);
 SREG = cSREG;
 }
 ISR(INT0_vect) {
@@ -48,7 +47,7 @@ buttonScript(PINC & _BV(PC0), 0b11, 0b10);
 
 // TODO: change this method for each of the demo nodes
 void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
-    uint8_t cmd = *msg;
+    uint8_t cmd = msg[0];
     //Turn both off first
     PORTB &= ~(_BV(PB4));
     PORTB &= ~(_BV(PB6));
