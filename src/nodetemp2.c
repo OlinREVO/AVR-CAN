@@ -1,4 +1,3 @@
-
 #define F_CPU (1000000L)
 #include <avr/io.h>
 #include <util/delay.h>
@@ -74,6 +73,13 @@ int main (void) {
     DDRC &= ~(_BV(PC0)); // set pin 30 for input
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
 
+    // Telling the chip to use the crystal
+    CKSEL &= 0000;
+    
+    // Setting PE1 and PE2. XTAL1 to input and XTAL2 to ouput . Pins 10 and 11
+    DDRE |= _BV(PE2);
+    DDRE &= ~(_BV(PE1));
+    
     sei(); // enable global interrupts    
     initCAN(NODE_ID); // initialize CAN bus
     initButton(); // intitialize button interrupts
