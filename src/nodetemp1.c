@@ -69,7 +69,7 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
 
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output
-    DDRB &= ~(_BV(PB2)); // set pin 16 for input
+    //DDRB &= ~(_BV(PB2)); // set pin 16 for input
     DDRC &= ~(_BV(PC0)); // set pin 30 for input
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
   
@@ -78,7 +78,7 @@ int main (void) {
     DDRE &= ~(_BV(PE1));
     
     sei(); // enable global interrupts    
-    initCAN(NODE_ID); // initialize CAN bus
+    initCAN(NODE_HOME); // initialize CAN bus
     initButton(); // intitialize button interrupts
 
     for (;;) {
