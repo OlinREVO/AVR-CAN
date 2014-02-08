@@ -78,7 +78,7 @@ int main (void) {
     DDRE &= ~(_BV(PE1));
     
     sei(); // enable global interrupts    
-    initCAN(NODE_ID); // initialize CAN bus
+    initCAN(NODE_HOME); // initialize CAN bus
     initButton(); // intitialize button interrupts
 
     for (;;) {

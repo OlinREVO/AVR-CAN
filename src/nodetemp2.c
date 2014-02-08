@@ -41,7 +41,7 @@ ISR(INT0_vect) {
 }
 
 ISR(INT3_vect) {
-buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
+    buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
 }
 
 // TODO: change this method for each of the demo nodes
@@ -78,7 +78,7 @@ int main (void) {
     DDRE &= ~(_BV(PE1));
     
     sei(); // enable global interrupts    
-    initCAN(NODE_ID); // initialize CAN bus
+    initCAN(NODE_HOME); // initialize CAN bus
     initButton(); // intitialize button interrupts
 
     for (;;) {

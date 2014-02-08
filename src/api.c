@@ -49,6 +49,10 @@ int initCAN(uint8_t nodeID) {
     // enable reception, DLC8
     CANCDMOB = _BV(CONMOB1) | (8 << DLC0);
 
+    //Set Up Debug LED
+    DDRD |= _BV(PD3);
+
+
 /*    // set up MOb2 for reception of this broadcast messages
     CANPAGE = _BV(MOBNB2);
 
@@ -110,7 +114,9 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLength) 
 
     //Wait for MOb1 to be free
     // TODO: This is not good practice; take another look later
-    while(CANEN2 & (1 << ENMOB0));
+    PORTD &= ~(_BV(PD3))
+    while(CANEN2 & (1 << ENMOB0)){PORTB |= _BV(PD3)}; // Stuck in infinite loop?
+    PORTD &= ~(_BV(PD3))
     CANEN2 |= (1 << ENMOB0); //Claim MOb1
 
     //Clear MOb status register
