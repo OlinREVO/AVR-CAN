@@ -48,6 +48,11 @@ ISR(INT3_vect) {
 void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = msg[0];
     //Turn both off first
+    /*if (destID == NODE_HOME) {
+        PORTD |= _BV(PD3);
+    } else {
+        PORTD &= ~(_BV(PD3));
+    }*/
     PORTB &= ~(_BV(PB4));
     PORTB &= ~(_BV(PB6));
     int ledOn = cmd & 0b01;
@@ -64,6 +69,25 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
         } else {
             PORTB &= ~(_BV(PB6));
         }
+    }
+}
+
+void reset (){
+    // enable interrupts: all, receive
+    CANGIE = (_BV(ENIT) | _BV(ENRX));
+    // compatibility with future chips
+    CANIE1 = 0;
+    // enable interrupts on all MObs
+    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2));
+
+    int8_t mob;
+    for (mob=0; mob<6; mob++ ) {
+        // Selects Message Object 0-5
+        CANPAGE = ( mob << 4 );
+        // Disable mob
+        CANCDMOB = 0x00;
+        // Clear mob status register;
+        CANSTMOB = 0x00;
     }
 }
 

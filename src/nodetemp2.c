@@ -12,7 +12,7 @@
 
 //DemoNode Id
 int NODE_HOME = NODE_demoNode2;
-int NODE_TARGET_1 = NODE_demoNode3;
+int NODE_TARGET_1 = NODE_demoNode1;
 //int NODE_TARGET_2 = NODE_demoNode3;
 
 
@@ -48,6 +48,11 @@ ISR(INT3_vect) {
 void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = msg[0];
     //Turn both off first
+/*    if (destID == NODE_HOME) {
+        PORTD |= _BV(PD3);
+    } else {
+        PORTD &= ~(_BV(PD3));
+    }*/
     PORTB &= ~(_BV(PB4));
     PORTB &= ~(_BV(PB6));
     int ledOn = cmd & 0b01;

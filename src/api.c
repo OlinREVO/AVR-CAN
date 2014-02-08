@@ -56,7 +56,7 @@ int initCAN(uint8_t nodeID) {
 /*    // set up MOb2 for reception of this broadcast messages
     CANPAGE = _BV(MOBNB2);
 
-    // MOb ID/IDmsk settings
+    // MOb ID/IDmsk settinxgs
     // set compatibility registers to 0, RTR/IDE-mask to 1
     CANIDM4 = (_BV(RTRMSK) | _BV(IDEMSK)); // write to 0x00?
     CANIDT4 = 0x00;
@@ -88,6 +88,7 @@ void readMsg(void) {
     CANPAGE &= ~(_BV(AINC) | _BV(INDX2) | _BV(INDX1) | _BV(INDX0)); // set data page 0
     uint8_t msgLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC (0b1111)
     uint8_t receivedMsg[msgLength];
+    PORTD |= _BV(PD3);
 
     // read the data into a local memory block
     int i;
@@ -114,9 +115,7 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLength) 
 
     //Wait for MOb1 to be free
     // TODO: This is not good practice; take another look later
-    PORTD &= ~(_BV(PD3))
-    while(CANEN2 & (1 << ENMOB0)){PORTB |= _BV(PD3)}; // Stuck in infinite loop?
-    PORTD &= ~(_BV(PD3))
+    while(CANEN2 & (1 << ENMOB0)); // Stuck in infinite loop?
     CANEN2 |= (1 << ENMOB0); //Claim MOb1
 
     //Clear MOb status register
