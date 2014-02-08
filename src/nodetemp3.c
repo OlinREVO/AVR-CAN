@@ -11,7 +11,10 @@
 #define maxDataLength 8
 
 //DemoNode Id
-NODE_ID = NODE_demoNode1;
+int NODE_HOME = NODE_demoNode3;
+int NODE_TARGET_1 = NODE_demoNode1;
+//int NODE_TARGET_2 = NODE_demoNode2;
+
 
 // Set up external interrupts for INT0 for any logical change
 int initButton() {
@@ -21,7 +24,7 @@ int initButton() {
     return(0);
 }
 
-void buttonScript(int val, uint8_t x, uint8_t y){
+void buttonScript(int target, int val, uint8_t x, uint8_t y){
 char cSREG = SREG; //Store SREG
     uint8_t msg[1];
     if (val) {
@@ -29,19 +32,15 @@ char cSREG = SREG; //Store SREG
     } else {
         msg[0] = y; // turn top LED off
     }
-    sendCANmsg(NODE_demoNode2, MSG_demoMsg, msg, 1);
+    sendCANmsg(target, MSG_demoMsg, msg, 1);
 SREG = cSREG;
 }
 ISR(INT0_vect) {
-    buttonScript(PIND & _BV(PD6), 0b01, 0b00);
-}
-
-ISR(INT1_vect) {
-buttonScript(PINB & _BV(PB2), 0b11, 0b10);
+    buttonScript(NODE_TARGET_1, PIND & _BV(PD6), 0b01, 0b00);
 }
 
 ISR(INT3_vect) {
-buttonScript(PINC & _BV(PC0), 0b11, 0b10);
+	buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
 }
 
 // TODO: change this method for each of the demo nodes
@@ -72,10 +71,7 @@ int main (void) {
     DDRB &= ~(_BV(PB2)); // set pin 16 for input
     DDRC &= ~(_BV(PC0)); // set pin 30 for input
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
-
-    // Telling the chip to use the crystal
-    CKSEL &= 0000;
-    
+  
     // Setting PE1 and PE2. XTAL1 to input and XTAL2 to ouput . Pins 10 and 11
     DDRE |= _BV(PE2);
     DDRE &= ~(_BV(PE1));
@@ -88,4 +84,3 @@ int main (void) {
         // listen for button presses forever
     }
 }
-

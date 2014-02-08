@@ -11,8 +11,8 @@
 #define maxDataLength 8
 
 //DemoNode Id
-int NODE_HOME = NODE_demoNode2;
-int NODE_TARGET_1 = NODE_demoNode1;
+int NODE_HOME = NODE_demoNode1;
+int NODE_TARGET_1 = NODE_demoNode2;
 //int NODE_TARGET_2 = NODE_demoNode3;
 
 
@@ -25,7 +25,7 @@ int initButton() {
 }
 
 void buttonScript(int target, int val, uint8_t x, uint8_t y){
-char cSREG = SREG; //Store SREG
+    char cSREG = SREG; //Store SREG
     uint8_t msg[1];
     if (val) {
         msg[0] = x; // turn top LED on
@@ -33,7 +33,7 @@ char cSREG = SREG; //Store SREG
         msg[0] = y; // turn top LED off
     }
     sendCANmsg(target, MSG_demoMsg, msg, 1);
-SREG = cSREG;
+    SREG = cSREG;
 }
 
 ISR(INT0_vect) {
@@ -41,7 +41,7 @@ ISR(INT0_vect) {
 }
 
 ISR(INT3_vect) {
-buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
+    buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
 }
 
 // TODO: change this method for each of the demo nodes
