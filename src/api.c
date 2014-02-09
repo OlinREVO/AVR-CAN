@@ -88,7 +88,6 @@ void readMsg(void) {
     CANPAGE &= ~(_BV(AINC) | _BV(INDX2) | _BV(INDX1) | _BV(INDX0)); // set data page 0
     uint8_t msgLength = (CANCDMOB & 0x0F); // last 4 bits are the DLC (0b1111)
     uint8_t receivedMsg[msgLength];
-    PORTD |= _BV(PD3);
 
     // read the data into a local memory block
     int i;
@@ -154,7 +153,12 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLength) 
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
 
+    uint8_t mobIndex = (CANHPMOB & 0xF0) >> 4;
+    CANPAGE &= 0x0F; // clear out the top 4 bits (current MOb)
+    CANPAGE |= mobIndex << 4; // set the current page
+
     if (CANSTMOB & _BV(RXOK)) {
+        PORTD |= _BV(PD3);
         CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
         readMsg();
     } else if (CANSTMOB & _BV(TXOK)) {
