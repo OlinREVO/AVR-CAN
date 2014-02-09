@@ -153,12 +153,11 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLength) 
 ISR(CAN_INT_vect) {
     char cSREG = SREG; //store SREG
 
-    uint8_t mobIndex = (CANHPMOB & 0xF0) >> 4;
+    uint8_t mobIndex = (CANHPMOB & 0xF0) >> 4; // check which MOb received the interrupt
     CANPAGE &= 0x0F; // clear out the top 4 bits (current MOb)
-    CANPAGE |= mobIndex << 4; // set the current page
+    CANPAGE |= mobIndex << 4; // set the current MOb
 
     if (CANSTMOB & _BV(RXOK)) {
-        PORTD |= _BV(PD3);
         CANSTMOB &= ~(_BV(RXOK)); // reset receive interrupt flag
         readMsg();
     } else if (CANSTMOB & _BV(TXOK)) {
