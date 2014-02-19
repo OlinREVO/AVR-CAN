@@ -43,7 +43,7 @@ int initCAN(uint8_t nodeID) {
     // accept only this node's node ID (bits 6-10)
     CANIDM2 = 0x00;
     CANIDT2 = 0x00;
-    CANIDM1 = 0x00; // 0b11111000
+    CANIDM1 = 0xF8; // 0b11111000
     CANIDT1 = ((nodeID & 0x1F) << 3); // node ID
 
     // enable reception, DLC8
