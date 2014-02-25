@@ -49,26 +49,19 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = msg[0];
     int ledOn = cmd & 0b01;
     int whichLED = cmd & 0b10;
-
-    int me = (((NODE_HOME & 0x1F) << 7) | (msgID & 0x3F) & 0x07C0) == destID;
-    /*if (NODE_HOME == destID)*/
-    /*if ((destID << 7) == NODE_HOME)*/
-    if (me) {
-        if (whichLED) {
-            if (ledOn) {
-                PORTB |= _BV(PB4);
-            } else {
-                PORTB &= ~(_BV(PB4));
-            }
+    if (whichLED) {
+        if (ledOn) {
+            PORTB |= _BV(PB4);
         } else {
-            if (ledOn) {
-                PORTB |= _BV(PB6);
-            } else {
-                PORTB &= ~(_BV(PB6));
-            }
+            PORTB &= ~(_BV(PB4));
+        }
+    } else {
+        if (ledOn) {
+            PORTB |= _BV(PB6);
+        } else {
+            PORTB &= ~(_BV(PB6));
         }
     }
-
 }
 
 void reset (){
