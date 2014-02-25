@@ -13,7 +13,7 @@
 //DemoNode Id
 int NODE_HOME = NODE_demoNode1;
 int NODE_TARGET_1 = NODE_demoNode2;
-int NODE_TARGET_2 = NODE_demoNode3;
+//int NODE_TARGET_2 = NODE_demoNode3;
 
 
 // Set up external interrupts for INT0 for any logical change
@@ -41,52 +41,29 @@ ISR(INT0_vect) {
 }
 
 ISR(INT3_vect) {
-    buttonScript(NODE_TARGET_2, PINC & _BV(PC0), 0b11, 0b10);
+    buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
 }
 
 // TODO: change this method for each of the demo nodes
 void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = msg[0];
+    //Turn both off first
+    PORTB &= ~(_BV(PB4));
+    PORTB &= ~(_BV(PB6));
     int ledOn = cmd & 0b01;
     int whichLED = cmd & 0b10;
-
-    int me = (((NODE_HOME & 0x1F) << 7) | (msgID & 0x3F) & 0x07C0) == destID;
-    /*if (NODE_HOME == destID)*/
-    /*if ((destID << 7) == NODE_HOME)*/
-    if (me) {
-        if (whichLED) {
-            if (ledOn) {
-                PORTB |= _BV(PB4);
-            } else {
-                PORTB &= ~(_BV(PB4));
-            }
+    if (whichLED) {
+        if (ledOn) {
+            PORTB |= _BV(PB4);
         } else {
-            if (ledOn) {
-                PORTB |= _BV(PB6);
-            } else {
-                PORTB &= ~(_BV(PB6));
-            }
+            PORTB &= ~(_BV(PB4));
         }
-    }
-
-}
-
-void reset (){
-    // enable interrupts: all, receive
-    CANGIE = (_BV(ENIT) | _BV(ENRX));
-    // compatibility with future chips
-    CANIE1 = 0;
-    // enable interrupts on all MObs
-    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2));
-
-    int8_t mob;
-    for (mob=0; mob<6; mob++ ) {
-        // Selects Message Object 0-5
-        CANPAGE = ( mob << 4 );
-        // Disable mob
-        CANCDMOB = 0x00;
-        // Clear mob status register;
-        CANSTMOB = 0x00;
+    } else {
+        if (ledOn) {
+            PORTB |= _BV(PB6);
+        } else {
+            PORTB &= ~(_BV(PB6));
+        }
     }
 }
 
@@ -100,6 +77,8 @@ int main (void) {
     DDRE |= _BV(PE2);
     DDRE &= ~(_BV(PE1));
     
+
+    PORTB |= _BV(PB3)
     sei(); // enable global interrupts    
     initCAN(NODE_HOME); // initialize CAN bus
     initButton(); // intitialize button interrupts

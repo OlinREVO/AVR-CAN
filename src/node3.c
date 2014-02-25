@@ -13,7 +13,7 @@
 //DemoNode Id
 int NODE_HOME = NODE_demoNode3;
 int NODE_TARGET_1 = NODE_demoNode1;
-//int NODE_TARGET_2 = NODE_demoNode3;
+int NODE_TARGET_2 = NODE_demoNode2;
 
 
 // Set up external interrupts for INT0 for any logical change
@@ -37,11 +37,11 @@ SREG = cSREG;
 }
 
 ISR(INT0_vect) {
-    buttonScript(NODE_TARGET_1, PIND & _BV(PD6), 0b01, 0b00);
+        buttonScript(NODE_TARGET_1, PIND & _BV(PD6), 0b01, 0b00);
 }
 
 ISR(INT3_vect) {
-    buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
+    buttonScript(NODE_TARGET_2, PINC & _BV(PC0), 0b11, 0b10);
 }
 
 // TODO: change this method for each of the demo nodes
@@ -49,20 +49,23 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = msg[0];
     int ledOn = cmd & 0b01;
     int whichLED = cmd & 0b10;
-    if (whichLED) {
-        if (ledOn) {
-            PORTB |= _BV(PB4);
+    if {destID == NODE_HOME} {
+        if (whichLED) {
+            if (ledOn) {
+                PORTB |= _BV(PB4);
+            } else {
+                PORTB &= ~(_BV(PB4));
+            }
         } else {
-            PORTB &= ~(_BV(PB4));
-        }
-    } else {
-        if (ledOn) {
-            PORTB |= _BV(PB6);
-        } else {
-            PORTB &= ~(_BV(PB6));
+            if (ledOn) {
+                PORTB |= _BV(PB6);
+            } else {
+                PORTB &= ~(_BV(PB6));
+            }
         }
     }
 }
+
 
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output
