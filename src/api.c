@@ -98,7 +98,7 @@ void readMsg(void) {
 
     // take all of IDT1 and the first 3 bits of IDT2
     uint16_t idtag = (_BV(CANIDT1) << 3) | ((_BV(CANIDT2) & 0xE0) >> 5);
-    uint8_t nodeID = (idtag & 0x07C0); // nodeID is bits 6-10 (0 b11 111 000 000)
+    uint8_t nodeID = (idtag & 0x07C0); // nodeID is bits 6-10 (0b11111000000)
     uint8_t msgID = (idtag & 0x003F); // msgID is bits 0-5 (0b111111)
 
     // externally-defined handler method
@@ -130,9 +130,8 @@ int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLength) 
     CANIDT4 = 0;
     CANIDT3 = 0;
 
-    // set ID tag registers 
-    /*uint16_t idtag = ((destID & 0x1F) << 6) | (msgID & 0x3F);*/
-    uint16_t idtag = ((destID & 0x1F) << 7) | (msgID & 0x3F);
+    // set ID tag registers
+    uint16_t idtag = ((destID & 0x1F) << 6) | (msgID & 0x3F);
     CANIDT2 = ((idtag & 0x07) << 5); // bits 0-2 of idtag (0b0111)
     CANIDT1 = ((idtag & 0x7F8) >> 3); // bits 3-10 of idtag (0b11111111000)
 

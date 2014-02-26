@@ -12,7 +12,7 @@
 
 //DemoNode Id
 int NODE_HOME = NODE_demoNode2;
-int NODE_TARGET_1 = NODE_demoNode3;
+int NODE_TARGET_1 = NODE_demoNode1;
 int NODE_TARGET_2 = NODE_demoNode1;
 
 
@@ -25,7 +25,7 @@ int initButton() {
 }
 
 void buttonScript(int target, int val, uint8_t x, uint8_t y){
-char cSREG = SREG; //Store SREG
+    char cSREG = SREG; //Store SREG
     uint8_t msg[1];
     if (val) {
         msg[0] = x; // turn top LED on
@@ -33,7 +33,7 @@ char cSREG = SREG; //Store SREG
         msg[0] = y; // turn top LED off
     }
     sendCANmsg(target, MSG_demoMsg, msg, 1);
-SREG = cSREG;
+    SREG = cSREG;
 }
 
 ISR(INT0_vect) {
@@ -64,13 +64,31 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     }
 }
 
+void reset (){
+    // enable interrupts: all, receive
+    CANGIE = (_BV(ENIT) | _BV(ENRX));
+    // compatibility with future chips
+    CANIE1 = 0;
+    // enable interrupts on all MObs
+    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2));
+
+    int8_t mob;
+    for (mob=0; mob<6; mob++ ) {
+        // Selects Message Object 0-5
+        CANPAGE = ( mob << 4 );
+        // Disable mob
+        CANCDMOB = 0x00;
+        // Clear mob status register;
+        CANSTMOB = 0x00;
+    }
+}
+
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output
     //DDRB &= ~(_BV(PB2)); // set pin 16 for input
     DDRC &= ~(_BV(PC0)); // set pin 30 for input
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
-/*    DDRD |= (_BV(PD0));
-    PORTD |= (_BV(PD0));*/
+  
     // Setting PE1 and PE2. XTAL1 to input and XTAL2 to ouput . Pins 10 and 11
     DDRE |= _BV(PE2);
     DDRE &= ~(_BV(PE1));

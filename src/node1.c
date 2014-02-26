@@ -13,7 +13,7 @@
 //DemoNode Id
 int NODE_HOME = NODE_demoNode1;
 int NODE_TARGET_1 = NODE_demoNode2;
-int NODE_TARGET_2 = NODE_demoNode3;
+int NODE_TARGET_2 = NODE_demoNode2;
 
 
 // Set up external interrupts for INT0 for any logical change
