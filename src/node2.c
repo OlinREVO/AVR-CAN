@@ -25,7 +25,7 @@ int initButton() {
 }
 
 void buttonScript(int target, int val, uint8_t x, uint8_t y){
-    char cSREG = SREG; //Store SREG
+char cSREG = SREG; //Store SREG
     uint8_t msg[1];
     if (val) {
         msg[0] = x; // turn top LED on
@@ -33,11 +33,11 @@ void buttonScript(int target, int val, uint8_t x, uint8_t y){
         msg[0] = y; // turn top LED off
     }
     sendCANmsg(target, MSG_demoMsg, msg, 1);
-    SREG = cSREG;
+SREG = cSREG;
 }
 
 ISR(INT0_vect) {
-    buttonScript(NODE_TARGET_1, PIND & _BV(PD6), 0b01, 0b00);
+        buttonScript(NODE_TARGET_1, PIND & _BV(PD6), 0b01, 0b00);
 }
 
 ISR(INT3_vect) {
@@ -49,6 +49,7 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = msg[0];
     int ledOn = cmd & 0b01;
     int whichLED = cmd & 0b10;
+
     if (whichLED) {
         if (ledOn) {
             PORTB |= _BV(PB4);
@@ -64,24 +65,6 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     }
 }
 
-void reset (){
-    // enable interrupts: all, receive
-    CANGIE = (_BV(ENIT) | _BV(ENRX));
-    // compatibility with future chips
-    CANIE1 = 0;
-    // enable interrupts on all MObs
-    CANIE2 = (_BV(IEMOB0) | _BV(IEMOB1) | _BV(IEMOB2));
-
-    int8_t mob;
-    for (mob=0; mob<6; mob++ ) {
-        // Selects Message Object 0-5
-        CANPAGE = ( mob << 4 );
-        // Disable mob
-        CANCDMOB = 0x00;
-        // Clear mob status register;
-        CANSTMOB = 0x00;
-    }
-}
 
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output
