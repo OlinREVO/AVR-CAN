@@ -47,6 +47,7 @@
 #define NODE_demoNode1      ((uint8_t) 0xC)
 #define NODE_demoNode2      ((uint8_t) 0xD)
 #define NODE_demoNode3      ((uint8_t) 0xE)
+#define NODE_ble            ((uint8_t) 0xF)
 
 #define MSG_critical        ((uint8_t) 0x0)
 #define MSG_warning         ((uint8_t) 0x1)

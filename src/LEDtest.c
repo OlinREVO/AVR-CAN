@@ -13,7 +13,7 @@
 //DemoNode Id
 int NODE_HOME = NODE_demoNode1;
 int NODE_TARGET_1 = NODE_demoNode2;
-int NODE_TARGET_2 = NODE_demoNode3;
+//int NODE_TARGET_2 = NODE_demoNode3;
 
 
 // Set up external interrupts for INT0 for any logical change
@@ -25,7 +25,7 @@ int initButton() {
 }
 
 void buttonScript(int target, int val, uint8_t x, uint8_t y){
-char cSREG = SREG; //Store SREG
+    char cSREG = SREG; //Store SREG
     uint8_t msg[1];
     if (val) {
         msg[0] = x; // turn top LED on
@@ -33,23 +33,25 @@ char cSREG = SREG; //Store SREG
         msg[0] = y; // turn top LED off
     }
     sendCANmsg(target, MSG_demoMsg, msg, 1);
-SREG = cSREG;
+    SREG = cSREG;
 }
 
 ISR(INT0_vect) {
-        buttonScript(NODE_TARGET_1, PIND & _BV(PD6), 0b01, 0b00);
+    buttonScript(NODE_TARGET_1, PIND & _BV(PD6), 0b01, 0b00);
 }
 
 ISR(INT3_vect) {
-    buttonScript(NODE_TARGET_2, PINC & _BV(PC0), 0b11, 0b10);
+    buttonScript(NODE_TARGET_1, PINC & _BV(PC0), 0b11, 0b10);
 }
 
 // TODO: change this method for each of the demo nodes
 void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     uint8_t cmd = msg[0];
+    //Turn both off first
+    PORTB &= ~(_BV(PB4));
+    PORTB &= ~(_BV(PB6));
     int ledOn = cmd & 0b01;
     int whichLED = cmd & 0b10;
-
     if (whichLED) {
         if (ledOn) {
             PORTB |= _BV(PB4);
@@ -65,7 +67,6 @@ void handleCANmsg(uint8_t destID, uint8_t msgID, uint8_t* msg, uint8_t msgLen) {
     }
 }
 
-
 int main (void) {
     DDRB |= 0xFF; // set all PORTB pins for output
     //DDRB &= ~(_BV(PB2)); // set pin 16 for input
@@ -76,6 +77,8 @@ int main (void) {
     DDRE |= _BV(PE2);
     DDRE &= ~(_BV(PE1));
     
+
+    PORTB |= _BV(PB3)
     sei(); // enable global interrupts    
     initCAN(NODE_HOME); // initialize CAN bus
     initButton(); // intitialize button interrupts
