@@ -1,4 +1,4 @@
-#define F_CPU (1000000L)
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <inttypes.h>
@@ -9,6 +9,7 @@
 #include "uart.h"
 
 #define maxDataLength 8
+#define F_CPU (1000000L)
 
 //DemoNode Id
 int NODE_HOME = NODE_demoNode2;
