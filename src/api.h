@@ -56,6 +56,7 @@
 #define MSG_shunting        ((uint8_t) 0x4)
 #define MSG_shutdown        ((uint8_t) 0x5)
 #define MSG_data_other      ((uint8_t) 0x6)
+#define MSG_BMS_info        ((uint8_t) 0x7)
 #define MSG_demoMsg         ((uint8_t) 0xA)
 
 //#define MSG_batteryLevel    3;
