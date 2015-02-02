@@ -1,5 +1,5 @@
 /* ------------------------------- REVO CAN API -------------------------------
- * 
+ *
  * Author: Derek Redfern, Heather Boortz, Olin College REVO
  * Last modified: Fall 2013
  * Contact: redfern.derek@gmail.com
@@ -42,6 +42,7 @@
 #define NODE_speedometer    ((uint8_t) 0x3)
 #define NODE_halleffect     ((uint8_t) 0x4)
 #define NODE_sdlogger       ((uint8_t) 0x5)
+#define NODE_charger        ((uint8_t) 0x6)
 #define NODE_demoClient     ((uint8_t) 0xA)
 #define NODE_demoServer     ((uint8_t) 0xB)
 #define NODE_demoNode1      ((uint8_t) 0xC)
