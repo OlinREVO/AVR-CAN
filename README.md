@@ -34,16 +34,4 @@ Git subtree is a tool to embed a repository inside of another repository. This i
 
 Demo Code
 -----
-Files: client.c, server.c
-
-This is a demonstration of two ATmega16M1s communicating across a CAN bus. The demo uses CAN messages to turn a remote LED on or off based on the state of a momentary button.
-
-The "server" chip sends the state of the button (0x00 or 0xFF) across the CAN bus to the client, which turns an LED on or off in turn.
-
-Making and flashing the demo
------
-To flash code onto an ATmega chip, run the following commands:
-* `make FILE=client flash` for the client
-* `make FILE=server flash` for the server
-
-You may need to append `sudo` to these commands based on your system setup.
+For demo code using the CAN API, check out the 'demos' branch of this repository.
