@@ -1,3 +1,0 @@
-[submodule "UART"]
-	path = src/UART
-	url = https://github.com/OlinREVO/AVR-UART.git
