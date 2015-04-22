@@ -45,7 +45,7 @@ int initCAN(uint8_t nodeID) {
     CANIDM2 = 0x00;
     CANIDT2 = 0x00;
 
-    if (nodeID == NODE_ble) {
+    if (nodeID == NODE_watchdog) {
         CANIDM1 = 0x00; //This node will recieve all messages
     }
     else {
