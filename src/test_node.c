@@ -21,6 +21,7 @@ int main (void) {
     //DDRB &= ~(_BV(PB2)); // set pin 16 for input
     DDRC &= ~(_BV(PC0)); // set pin 30 for input
     DDRD &= ~(_BV(PD6)); // set pin 14 for input
+    DDRB &= ~(_BV(PB5)); // pin 26 (adc 6 for input)
 
     // Setting PE1 and PE2. XTAL1 to input and XTAL2 to ouput . Pins 10 and 11
     DDRE |= _BV(PE2);
@@ -39,8 +40,9 @@ int main (void) {
     sei(); // enable global interrupts
     initCAN(NODE_bms); // initialize CAN bus
 
-    uint8_t data[1];
-    uint8_t data2[1];
+    uint8_t data[3];
+    uint8_t data2[3];
+    //uint8_t *data3 = malloc(2 * sizeof(uint8_t));
 
     for (;;) {
         ADCSRA |=  _BV(ADSC);
@@ -49,13 +51,20 @@ int main (void) {
         //ADC is a macro to combine ADCL and ADCH
         uint16_t pos_reading = ADC;
         data[0] = pos_reading >> 2;
-        data2[0] = 0xF0;
+        data[1] = 0x00;
+        data[2] = 0x0F;
 
-        sendCANmsg(NODE_ble, MSG_speed, data, 1);
+        data2[0] = 0xFF;
+        data2[1] = 0x0F;
+        data2[2] = 0x0A;
+
+        //data3[2] = 0x00;
+
+        sendCANmsg(NODE_charger, MSG_speed, data, 3);
         _delay_ms(1000);
+//        _delay_ms(1000);
 
-        sendCANmsg(NODE_ble, MSG_data_other, data2, 1);
-
+        sendCANmsg(NODE_halleffect, MSG_data_other, data2, 3);
         _delay_ms(1000);
     }
 }
