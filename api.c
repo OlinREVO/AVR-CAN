@@ -1,10 +1,11 @@
 #include "api.h"
+#include <assert.h>
 
 // must be called before CAN can be used
 // Sample call: initCAN(NODE_speedometer);
 int initCAN(uint8_t nodeID) {
     sei(); // enable global interrupts
-    
+
     CANGCON = _BV(SWRES); //Software reset
     CANTCON = 0x00; //CAN timing prescaler set to 0;
 
@@ -43,7 +44,14 @@ int initCAN(uint8_t nodeID) {
     // accept only this node's node ID (bits 6-10)
     CANIDM2 = 0x00;
     CANIDT2 = 0x00;
-    CANIDM1 = 0xF8; // 0b11111000
+
+    if (nodeID == NODE_ble) {
+        CANIDM1 = 0x00; //This node will recieve all messages
+    }
+    else {
+        CANIDM1 = 0xF8; // 0b11111000
+    }
+
     CANIDT1 = ((nodeID & 0x1F) << 3); // node ID
 
     // enable reception, DLC8
@@ -110,7 +118,7 @@ void readMsg(void) {
 // Sample call: sendCANmsg(NODE_watchdog,MSG_critical,data,dataLen);
 int sendCANmsg(uint8_t destID, uint8_t msgID, uint8_t msg[], uint8_t msgLength) {
     // use MOb 0 for sending and auto-increment bits in CAN page MOb register
-    CANPAGE = ( _BV(AINC));
+    CANPAGE = 0;
 
     //Wait for MOb1 to be free
     // TODO: This is not good practice; take another look later
@@ -165,7 +173,7 @@ ISR(CAN_INT_vect) {
     } else {
         CANSTMOB &= 0; // unknown interrupt
     }
-    
+
     SREG=cSREG; //restore SREG
 }
 
@@ -174,6 +182,6 @@ ISR(CAN_INT_vect) {
  *  will be called from an ISR and will delay your main loop
 
 void handleCANmsg(uint8_t destID, uint8_t msgID, char* msg, uint8_t msgLen) {
-    
+
 }
 */
